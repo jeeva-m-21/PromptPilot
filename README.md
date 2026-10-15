@@ -33,7 +33,7 @@ This generates the ready-to-load extension in the `dist/` folder.
 1. Click the PromptPilot icon in the Chrome toolbar.
 2. Click **Full Settings & History** (or open the Options page).
 3. Paste your Fireworks API key (e.g. `fw_...`) and click **Test Connection**.
-4. By default, it targets `accounts/fireworks/models/deepseek-v4-flash` (or choose `deepseek-v3` / `deepseek-r1`).
+4. By default, it targets `accounts/fireworks/models/deepseek-v4p1-flash` (or choose `deepseek-v3` / `deepseek-r1`).
 
 ---
 
