@@ -12,7 +12,9 @@
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
     "https://gemini.google.com/*",
-    "https://api.fireworks.ai/*"
+    "https://api.fireworks.ai/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
   ],
   "background": {
     "service_worker": "background.js",

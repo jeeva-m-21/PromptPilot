@@ -44,9 +44,20 @@ export interface HistoryItem {
   pinned?: boolean;
 }
 
+export type LLMProvider = 'fireworks' | 'ollama' | 'local_openai';
+
 export interface ExtensionSettings {
+  provider: LLMProvider;
   fireworksApiKey: string;
   model: string;
+  // Local Ollama configuration
+  ollamaEndpoint: string;
+  ollamaModel: string;
+  // Local LM Studio / llama.cpp OpenAI-compatible configuration
+  localOpenAiEndpoint: string;
+  localOpenAiModel: string;
+  localOpenAiApiKey?: string;
+  // General behavior
   pauseDelayMs: number; // default 1200
   sensitivity: 'quiet' | 'balanced' | 'proactive'; // quiet = 50, balanced = 35, proactive = 20
   maxQuestions: number; // default 3

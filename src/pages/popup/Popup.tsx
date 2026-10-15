@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, Settings, Key, ExternalLink, Sliders } from 'lucide-react';
+import { Sparkles, Settings, Key, ExternalLink, Sliders, Server, Cloud, Cpu } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '../../shared/constants';
-import { ExtensionSettings, PromptMode } from '../../shared/types';
+import { ExtensionSettings, LLMProvider, PromptMode } from '../../shared/types';
 
 export const Popup: React.FC = () => {
   const [settings, setSettings] = useState<ExtensionSettings>(DEFAULT_SETTINGS);
@@ -40,8 +40,27 @@ export const Popup: React.FC = () => {
   const hasApiKey = !!settings.fireworksApiKey?.trim();
   const modes: PromptMode[] = ['concise', 'detailed', 'code', 'creative', 'research'];
 
+  const getProviderLabel = (p: LLMProvider) => {
+    switch (p) {
+      case 'ollama':
+        return { name: 'Ollama (Local)', model: settings.ollamaModel, icon: Server };
+      case 'local_openai':
+        return { name: 'LM Studio / llama.cpp', model: settings.localOpenAiModel, icon: Cpu };
+      case 'fireworks':
+      default:
+        return {
+          name: 'Fireworks AI',
+          model: settings.model.split('/').pop() || 'deepseek-v4p1-flash',
+          icon: Cloud,
+        };
+    }
+  };
+
+  const activeProviderInfo = getProviderLabel(settings.provider);
+  const ProviderIcon = activeProviderInfo.icon;
+
   return (
-    <div className="p-4 bg-neutral-900 text-neutral-100 flex flex-col gap-3 font-sans">
+    <div className="p-4 bg-neutral-900 text-neutral-100 flex flex-col gap-3 font-sans w-80">
       {/* Brand Header */}
       <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
         <div className="flex items-center gap-2">
@@ -52,7 +71,7 @@ export const Popup: React.FC = () => {
             <h1 className="text-sm font-semibold tracking-tight text-white leading-none">
               PromptPilot
             </h1>
-            <span className="text-[10px] text-neutral-400">DeepSeek 4.1 Flash</span>
+            <span className="text-[10px] text-neutral-400">AI Prompt Copilot</span>
           </div>
         </div>
 
@@ -65,26 +84,58 @@ export const Popup: React.FC = () => {
         </button>
       </div>
 
-      {/* API Key Status Banner */}
-      {!hasApiKey ? (
+      {/* Provider Quick Switcher */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-[11px] font-medium text-neutral-400">Active LLM Runtime</label>
+        <div className="grid grid-cols-3 gap-1">
+          {(
+            [
+              { id: 'fireworks', label: 'Fireworks', icon: Cloud },
+              { id: 'ollama', label: 'Ollama', icon: Server },
+              { id: 'local_openai', label: 'LM Studio', icon: Cpu },
+            ] as const
+          ).map((prov) => {
+            const Icon = prov.icon;
+            const isSelected = settings.provider === prov.id;
+            return (
+              <button
+                key={prov.id}
+                type="button"
+                onClick={() => updateSetting('provider', prov.id)}
+                className={`py-1.5 px-2 rounded-lg text-[10px] font-medium border flex items-center justify-center gap-1 transition-all ${
+                  isSelected
+                    ? 'bg-brand-600/30 border-brand-500 text-white'
+                    : 'bg-neutral-800/80 border-neutral-700/60 text-neutral-400 hover:text-neutral-200'
+                }`}
+              >
+                <Icon className="w-3 h-3 text-brand-400" />
+                <span>{prov.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Active Provider Status Banner */}
+      {settings.provider === 'fireworks' && !hasApiKey ? (
         <div
           onClick={openOptions}
-          className="cursor-pointer p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between hover:bg-amber-500/20 transition-all"
+          className="cursor-pointer p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between hover:bg-amber-500/20 transition-all"
         >
           <div className="flex items-center gap-2">
             <Key className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="font-medium">Fireworks API Key required</span>
+            <span className="font-medium text-[11px]">API Key Required</span>
           </div>
           <ExternalLink className="w-3 h-3" />
         </div>
       ) : (
         <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px]">
           <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Fireworks Connected
+            <ProviderIcon className="w-3.5 h-3.5" />
+            <span className="font-medium">{activeProviderInfo.name}</span>
           </span>
-          <span className="font-mono text-[10px] text-neutral-400">
-            {settings.model.split('/').pop()}
+          <span className="font-mono text-[10px] text-neutral-300 max-w-[110px] truncate" title={activeProviderInfo.model}>
+            {activeProviderInfo.model}
           </span>
         </div>
       )}
@@ -92,7 +143,7 @@ export const Popup: React.FC = () => {
       {/* Prompt Mode Selector */}
       <div className="flex flex-col gap-1.5">
         <label className="text-[11px] font-medium text-neutral-400 flex items-center justify-between">
-          <span>Default Mode</span>
+          <span>Prompt Mode</span>
           <span className="capitalize text-brand-400 font-semibold">{settings.defaultMode}</span>
         </label>
         <div className="grid grid-cols-3 gap-1">
@@ -112,9 +163,9 @@ export const Popup: React.FC = () => {
         </div>
       </div>
 
-      {/* Enabled Sites */}
+      {/* Active Sites */}
       <div className="flex flex-col gap-1.5 pt-1">
-        <label className="text-[11px] font-medium text-neutral-400">Active Chat Sites</label>
+        <label className="text-[11px] font-medium text-neutral-400">Supported AI Chats</label>
         <div className="flex items-center justify-between gap-1 text-xs">
           {(['claude', 'chatgpt', 'gemini'] as const).map((site) => (
             <label
@@ -158,9 +209,9 @@ export const Popup: React.FC = () => {
           </kbd>
         </div>
         <div className="flex items-center justify-between">
-          <span>One-shot optimize</span>
+          <span>Revert original</span>
           <kbd className="px-1 rounded bg-neutral-800 border border-neutral-700 font-mono text-neutral-300">
-            ⌥⇧O
+            ⌥Z
           </kbd>
         </div>
       </div>

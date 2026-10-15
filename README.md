@@ -29,11 +29,13 @@ This generates the ready-to-load extension in the `dist/` folder.
 3. Click the **Load unpacked** button.
 4. Select the `dist/` directory inside this project folder (`/home/jeeva/projects/NLP_2/dist`).
 
-### 3. Add your Fireworks API Key
-1. Click the PromptPilot icon in the Chrome toolbar.
-2. Click **Full Settings & History** (or open the Options page).
-3. Paste your Fireworks API key (e.g. `fw_...`) and click **Test Connection**.
-4. By default, it targets `accounts/fireworks/models/deepseek-v4p1-flash` (or choose `deepseek-v3` / `deepseek-r1`).
+### 3. Choose your LLM Runtime (Cloud or Local)
+Click the PromptPilot icon in the Chrome toolbar and open **Settings**:
+- ⚡ **Fireworks AI (Cloud)**: Paste your Fireworks API key. By default, it targets `accounts/fireworks/models/deepseek-v4p1-flash` (or `deepseek-v3` / `deepseek-r1`).
+- 🦙 **Ollama (100% Local & Private)**: Runs offline on `http://localhost:11434`. Click "Scan Installed Local Models" to select from models installed on your machine (e.g. `llama3.2`, `deepseek-r1:7b`, `qwen2.5`).
+- 🖥️ **LM Studio / llama.cpp (Local OpenAI)**: Connects to local server endpoints like `http://localhost:1234/v1` or `http://localhost:8080/v1`.
+
+> **Tip for Ollama CORS**: Launch Ollama with `OLLAMA_ORIGINS="*" ollama serve` to ensure seamless local browser requests.
 
 ---
 
